@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Patient Appointment History</title>
+
+    <link rel="stylesheet" th:href="@{/css/monitor.css}">
+
+    <style>
+        body {
+            margin: 0;
+            padding: 40px;
+            font-family: 'Inter', sans-serif;
+            background-image: url('https://images.unsplash.com/photo-1629909613654-28e377c37b09?q=80&w=2070');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.85);
+            backdrop-filter: blur(10px);
+            z-index: -1;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: auto;
+        }
+
+        .back-btn {
+            background: rgba(56,189,248,0.15);
+            border: 1px solid rgba(56,189,248,0.4);
+            color: #38bdf8;
+            font-weight: 500;
+            padding: 8px 14px;
+            border-radius: 8px;
+            text-decoration: none;
+            margin-bottom: 20px;
+            display: inline-block;
+        }
+
+        .back-btn:hover {
+            background: #38bdf8;
+            color: #020617;
+        }
+
+        h1 {
+            font-size: 36px;
+            font-weight: 800;
+            color: #ffffff;
+            letter-spacing: 1px;
+        }
+
+        .sub {
+            color: #cbd5f5;
+            font-size: 15px;
+            margin-bottom: 20px;
+        }
+
+        /* STATS */
+        .stats {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: rgba(15, 23, 42, 0.7);
+            padding: 16px 22px;
+            border-radius: 14px;
+            border: 1px solid rgba(255,255,255,0.1);
+            backdrop-filter: blur(6px);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.37);
+        }
+
+        .stat-title {
+            font-size: 12px;
+            color: #94a3b8;
+        }
+
+        .stat-value {
+            font-size: 20px;
+            font-weight: 800;
+            color: #38bdf8;
+        }
+
+        /* TABLE WRAPPER */
+        .table-wrapper {
+            display: flex;
+            gap: 20px;
+            align-items: flex-start;
+        }
+
+        .card {
+            flex: 1;
+            background: rgba(15, 23, 42, 0.7);
+            border-radius: 18px;
+            padding: 24px;
+            border: 1px solid rgba(255,255,255,0.1);
+            backdrop-filter: blur(6px);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.37);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            padding: 14px;
+            background: #f1f5f9;
+            color: #020617;
+            font-size: 0.8rem;
+            letter-spacing: 1px;
+        }
+
+        td {
+            padding: 16px;
+            color: #cbd5f5;
+            vertical-align: middle;
+        }
+
+        tr {
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+
+        tr:hover {
+            background-color: rgba(255, 255, 255, 0.05);
+            transition: 0.3s;
+            cursor: pointer;
+        }
+
+        /* STATUS */
+        .status {
+            padding: 6px 14px;
+            border-radius: 999px;
+            font-size: 12px;
+        }
+
+        .completed {
+            background: #94a3b8;
+            color: #0f172a;
+        }
+
+        .ongoing {
+            background: #22c55e;
+            color: #022c22;
+        }
+
+        .upcoming {
+            background: #38bdf8;
+            color: #020617;
+        }
+
+        /* LEGEND */
+        .legend-vertical {
+            width: 180px;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            margin-top: 10px;
+        }
+
+        .legend-title {
+            font-size: 11px;
+            color: #94a3b8;
+            margin-bottom: 5px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(15, 23, 42, 0.6);
+            padding: 12px;
+            border-radius: 12px;
+            border: 1px solid rgba(255,255,255,0.06);
+        }
+
+        .legend-item .title {
+            font-size: 12px;
+            font-weight: 600;
+            color: #ffffff;
+        }
+
+        .legend-item .desc {
+            font-size: 10px;
+            color: rgba(148,163,184,0.7);
+        }
+
+        .dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+        }
+
+        .dot.completed { background: #94a3b8; }
+        .dot.ongoing { background: #22c55e; }
+        .dot.upcoming { background: #38bdf8; }
+
+        /* PAGINATION */
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .page-btn {
+            background: rgba(56,189,248,0.15);
+            border: 1px solid rgba(56,189,248,0.4);
+            color: #38bdf8;
+            padding: 6px 14px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        .page-btn:hover {
+            background: #38bdf8;
+            color: #020617;
+        }
+
+        .page-info {
+            color: #cbd5f5;
+            font-size: 13px;
+        }
+
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <a th:href="@{/ui/patient/dashboard(id=${patientId})}" class="back-btn">← Back to Dashboard</a>
+
+    <h1>Patient Appointment History</h1>
+    <div class="sub">Patient ID: <span th:text="${patientId}"></span></div>
+
+    <!-- STATS -->
+    <div class="stats">
+        <div class="stat-card">
+            <div class="stat-title">Total Visits</div>
+            <div class="stat-value" th:text="${#lists.size(history)}"></div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-title">Last Visit</div>
+            <div class="stat-value"
+                 th:text="${#temporals.format(history[0].startTime, 'dd MMM yyyy')}">
+            </div>
+        </div>
+    </div>
+
+    <div class="table-wrapper">
+
+        <div class="card">
+            <table>
+                <thead>
+                <tr>
+                    <th>DATE</th>
+                    <th>START</th>
+                    <th>END</th>
+                    <th>DOCTOR</th>
+                    <th>STATUS</th>
+                </tr>
+                </thead>
+
+                <tbody>
+                <tr th:each="record : ${history}">
+                    <td th:text="${#temporals.format(record.startTime, 'dd MMM yyyy')}"></td>
+                    <td th:text="${#temporals.format(record.startTime, 'HH:mm')}"></td>
+                    <td th:text="${#temporals.format(record.endTime, 'HH:mm')}"></td>
+                    <td th:text="${record.physicianName}"></td>
+
+                    <td>
+                        <span class="status"
+                              th:text="${record.status}"
+                              th:classappend="${record.status == 'UPCOMING'} ? ' upcoming' :
+                                               (${record.status == 'ONGOING'} ? ' ongoing' : ' completed')">
+                        </span>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+
+            <!-- PAGINATION -->
+            <div class="pagination">
+                <button class="page-btn" onclick="changePage(-1)">Previous</button>
+                <span class="page-info">Page <span id="currentPage">1</span></span>
+                <button class="page-btn" onclick="changePage(1)">Next</button>
+            </div>
+
+        </div>
+
+        <!-- LEGEND -->
+        <div class="legend-vertical">
+            <div class="legend-title">Status Guide</div>
+
+            <div class="legend-item">
+                <span class="dot completed"></span>
+                <div>
+                    <div class="title">Completed</div>
+                    <div class="desc">Finished</div>
+                </div>
+            </div>
+
+            <div class="legend-item">
+                <span class="dot ongoing"></span>
+                <div>
+                    <div class="title">Ongoing</div>
+                    <div class="desc">In progress</div>
+                </div>
+            </div>
+
+            <div class="legend-item">
+                <span class="dot upcoming"></span>
+                <div>
+                    <div class="title">Upcoming</div>
+                    <div class="desc">Scheduled</div>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+    let currentPage = 1;
+    const rowsPerPage = 5;
+
+    function showPage(page) {
+        const rows = document.querySelectorAll("tbody tr");
+        const totalPages = Math.ceil(rows.length / rowsPerPage);
+
+        if (page < 1 || page > totalPages) return;
+
+        currentPage = page;
+        document.getElementById("currentPage").innerText = currentPage;
+
+        rows.forEach((row, index) => {
+            row.style.display =
+                index >= (page - 1) * rowsPerPage &&
+                index < page * rowsPerPage
+                ? ""
+                : "none";
+        });
+    }
+
+    function changePage(step) {
+        showPage(currentPage + step);
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+        showPage(1);
+    });
+</script>
+
+</body>
+</html>

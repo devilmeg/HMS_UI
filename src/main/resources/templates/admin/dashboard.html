@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <title>HMS | Admin Dashboard</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-gradient-to-br from-slate-900 via-blue-950 to-slate-900 text-white min-h-screen">
+
+<!-- HEADER -->
+<header class="bg-white/10 backdrop-blur-xl border-b border-white/20 px-10 py-6">
+  <div class="max-w-7xl mx-auto flex justify-between items-center">
+
+    <div>
+      <h1 class="text-3xl font-black tracking-tight">⚙️ Admin Control Panel</h1>
+      <p class="text-slate-300 text-sm mt-1">Hospital Management System Central Hub</p>
+    </div>
+
+    <a href="/"
+       class="px-5 py-2 bg-blue-600 text-white rounded-full text-sm font-bold hover:bg-blue-700 transition-all shadow-lg flex items-center gap-2">
+      🏠 Home
+    </a>
+
+  </div>
+</header>
+
+<!-- MAIN -->
+<main class="max-w-7xl mx-auto p-10">
+
+  <!-- GRID -->
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+
+    <!-- REVENUE -->
+    <a href="/ui/admin/revenue"
+       class="group bg-white/10 backdrop-blur-xl border border-white/20 p-8 rounded-2xl shadow-xl hover:shadow-2xl hover:-translate-y-2 transition-all duration-300">
+
+      <div class="w-14 h-14 bg-green-500/20 text-green-400 rounded-xl flex items-center justify-center text-2xl mb-6 group-hover:scale-110 transition-transform">
+        💰
+      </div>
+
+      <h2 class="text-xl font-bold mb-2">Revenue Analytics</h2>
+
+      <p class="text-slate-300 text-sm leading-relaxed">
+        View financial reports, procedure costs, and room stay earnings with detailed breakdowns.
+      </p>
+
+      <div class="mt-6 text-green-400 font-bold text-sm uppercase tracking-wider">
+        View Reports →
+      </div>
+
+    </a>
+
+    <!-- STAFF -->
+    <a href="/ui/admin/staff"
+       class="group bg-white/10 backdrop-blur-xl border border-white/20 p-8 rounded-2xl shadow-xl hover:shadow-2xl hover:-translate-y-2 transition-all duration-300">
+
+      <div class="w-14 h-14 bg-blue-500/20 text-blue-400 rounded-xl flex items-center justify-center text-2xl mb-6 group-hover:scale-110 transition-transform">
+        👨‍⚕️
+      </div>
+
+      <h2 class="text-xl font-bold mb-2">Staff Management</h2>
+
+      <p class="text-slate-300 text-sm leading-relaxed">
+        Access the directory of physicians and nurses. Monitor department heads and affiliations.
+      </p>
+
+      <div class="mt-6 text-blue-400 font-bold text-sm uppercase tracking-wider">
+        Manage Staff →
+      </div>
+
+    </a>
+
+    <!-- LOGS -->
+    <a href="/ui/admin/logs"
+       class="group bg-white/10 backdrop-blur-xl border border-white/20 p-8 rounded-2xl shadow-xl hover:shadow-2xl hover:-translate-y-2 transition-all duration-300">
+
+      <div class="w-14 h-14 bg-zinc-500/20 text-zinc-300 rounded-xl flex items-center justify-center text-2xl mb-6 group-hover:scale-110 transition-transform">
+        📜
+      </div>
+
+      <h2 class="text-xl font-bold mb-2">System Logs</h2>
+
+      <p class="text-slate-300 text-sm leading-relaxed">
+        Monitor real-time application logs, debug issues, and filter by log levels (INFO/ERROR).
+      </p>
+
+      <div class="mt-6 text-zinc-300 font-bold text-sm uppercase tracking-wider">
+        Open Terminal →
+      </div>
+
+    </a>
+
+  </div>
+
+  <!-- STATUS BAR -->
+  <div class="mt-12 bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl p-6 flex justify-between items-center shadow-xl">
+
+    <div class="flex items-center gap-4">
+
+      <!-- Animated Dot -->
+      <div class="flex h-3 w-3 relative">
+        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+        <span class="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span>
+      </div>
+
+      <span class="text-sm text-slate-300">
+        System Status: <span class="text-white font-semibold">Active</span>
+      </span>
+
+    </div>
+
+    <div class="text-xs text-slate-400 font-mono">
+      Last Sync:
+      <span th:text="${#calendars.format(#calendars.createNow(), 'yyyy-MM-dd HH:mm')}"></span>
+    </div>
+
+  </div>
+
+</main>
+
+</body>
+</html>

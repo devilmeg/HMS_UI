@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Revenue Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- 🔥 ANIMATION -->
+    <style>
+        @keyframes floatUp {
+            0% { transform: translateY(0); }
+            50% { transform: translateY(-6px); }
+            100% { transform: translateY(0); }
+        }
+        .float-card:hover {
+            animation: floatUp 0.6s ease-in-out;
+        }
+    </style>
+</head>
+
+<body class="bg-gradient-to-br from-slate-900 via-blue-950 to-slate-900 text-white p-10">
+
+<div class="max-w-7xl mx-auto">
+
+    <!-- HEADER -->
+    <div class="flex justify-between items-center mb-8">
+
+        <div>
+            <h1 class="text-3xl font-bold">Revenue Dashboard</h1>
+            <p class="text-slate-400 text-sm">Financial analytics overview</p>
+        </div>
+
+        <a href="/ui/admin/dashboard"
+           class="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded shadow">
+            🏠 Home
+        </a>
+
+    </div>
+
+    <!-- SEARCH + PAGE SIZE -->
+    <div class="flex justify-between items-center mb-6">
+
+        <!-- SEARCH -->
+        <input id="searchInput"
+               type="text"
+               placeholder="Search procedure..."
+               class="w-1/2 p-3 rounded bg-white/10 backdrop-blur-xl border border-white/20 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"/>
+
+        <!-- PAGE SIZE -->
+        <form method="get" th:action="@{/ui/admin/revenue}">
+            <input type="hidden" name="page" value="0"/>
+
+            <select name="size" onchange="this.form.submit()"
+                    class="p-2 rounded bg-gray-800 border border-gray-700 text-white">
+
+                <option value="5" th:selected="${size == 5}">5</option>
+                <option value="10" th:selected="${size == 10}">10</option>
+                <option value="20" th:selected="${size == 20}">20</option>
+                <option value="50" th:selected="${size == 50}">50</option>
+
+            </select>
+        </form>
+
+    </div>
+
+    <!-- TOTAL RECORDS -->
+    <p class="text-slate-400 mb-4">
+        Total Records: <span th:text="${response.totalRecords}"></span>
+    </p>
+
+    <!-- ERROR -->
+    <div th:if="${error}"
+         class="bg-red-500/20 border border-red-500 text-red-300 p-3 rounded mb-4">
+        <span th:text="${error}"></span>
+    </div>
+
+    <!-- 🔥 GLASS TABLE -->
+    <div class="bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl shadow-xl overflow-hidden">
+
+        <table class="w-full text-sm text-left" id="revenueTable">
+
+            <!-- HEADER -->
+            <thead class="bg-black/40 text-gray-300">
+            <tr>
+                <th class="p-4">Source</th>
+                <th class="p-4">Category</th>
+                <th class="p-4">Procedure</th>
+                <th class="p-4 text-center">Count</th>
+                <th class="p-4 text-right">Unit Cost</th>
+                <th class="p-4 text-right">Revenue</th>
+            </tr>
+            </thead>
+
+            <tbody>
+
+            <!-- NO DATA -->
+            <tr th:if="${response.data == null}">
+                <td colspan="6" class="p-4 text-center text-gray-400">
+                    No Revenue Data Found
+                </td>
+            </tr>
+
+            <!-- DATA -->
+            <tr th:each="r : ${response.data}"
+                class="border-b border-gray-800 hover:bg-white/5 transition float-card">
+
+                <!-- SOURCE -->
+                <td class="p-4">
+                    <span th:text="${r.source}"
+                          th:classappend="${r.source == 'Procedure' ? 'bg-blue-500/20 text-blue-400' : 'bg-green-500/20 text-green-400'}"
+                          class="px-2 py-1 rounded text-xs font-semibold">
+                    </span>
+                </td>
+
+                <!-- CATEGORY -->
+                <td class="p-4 text-slate-300"
+                    th:text="${r.category}"></td>
+
+                <!-- PROCEDURE -->
+                <td class="p-4 font-semibold text-white"
+                    th:text="${r.identifier}"></td>
+
+                <!-- COUNT -->
+                <td class="p-4 text-center text-purple-400 font-bold"
+                    th:text="${r.count}"></td>
+
+                <!-- UNIT COST -->
+                <td class="p-4 text-right text-blue-400"
+                    th:text="'₹ ' + ${r.unitCost}"></td>
+
+                <!-- REVENUE -->
+                <td class="p-4 text-right font-bold"
+                    th:classappend="${r.revenue > 5000 ? 'text-green-400' : 'text-green-300'}"
+                    th:text="'₹ ' + ${r.revenue}">
+                </td>
+
+            </tr>
+
+            </tbody>
+        </table>
+
+    </div>
+
+    <!-- PAGINATION -->
+    <div class="flex justify-between items-center mt-6">
+
+        <a th:if="${response.currentPage > 0}"
+           th:href="@{${baseUrl}(page=${response.currentPage - 1}, size=${size})}"
+           class="px-4 py-2 bg-gray-800 rounded hover:bg-gray-700">
+            ⬅ Prev
+        </a>
+
+        <span class="text-gray-300">
+            Page [[${response.currentPage + 1}]] of [[${response.totalPages}]]
+        </span>
+
+        <a th:if="${response.currentPage < response.totalPages - 1}"
+           th:href="@{${baseUrl}(page=${response.currentPage + 1}, size=${size})}"
+           class="px-4 py-2 bg-gray-800 rounded hover:bg-gray-700">
+            Next ➡
+        </a>
+
+    </div>
+
+</div>
+
+<!-- SEARCH SCRIPT -->
+<script>
+    const input = document.getElementById("searchInput");
+
+    input.addEventListener("keyup", function () {
+        let filter = input.value.toLowerCase();
+        let rows = document.querySelectorAll("#revenueTable tbody tr");
+
+        rows.forEach(row => {
+            let text = row.innerText.toLowerCase();
+            row.style.display = text.includes(filter) ? "" : "none";
+        });
+    });
+</script>
+
+</body>
+</html>
