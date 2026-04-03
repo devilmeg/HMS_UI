@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Patient Profile | HMS</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #0f172a, #1e293b);
+            color: white;
+            padding: 40px;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(10px);
+            border-radius: 12px;
+            padding: 30px;
+            max-width: 500px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        h2 { color: #38bdf8; margin-top: 0; }
+
+        .info-group {
+            margin-bottom: 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            padding-bottom: 10px;
+        }
+
+        .label {
+            color: #94a3b8;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .value {
+            font-size: 1.1rem;
+            margin-top: 5px;
+        }
+
+        .back-btn {
+            display: inline-block;
+            margin-bottom: 20px;
+            padding: 8px 14px;
+            border: 1px solid #38bdf8;
+            border-radius: 8px;
+            color: #38bdf8;
+            text-decoration: none;
+            transition: 0.3s;
+        }
+
+        .back-btn:hover {
+            background: #38bdf8;
+            color: black;
+        }
+    </style>
+</head>
+<body>
+
+<a th:href="@{/ui/patient/{id}/dashboard(id=${patientId})}" class="back-btn">
+    ⬅ Back to Dashboard
+</a>
+
+<div class="card">
+    <h2>Patient Profile</h2>
+
+    <div class="info-group">
+        <div class="label">Full Name</div>
+        <div class="value" th:text="${patient.name}">John Smith</div>
+    </div>
+
+    <div class="info-group">
+        <div class="label">SSN</div>
+        <div class="value" th:text="${patient.ssn}">000-00-0000</div>
+    </div>
+
+    <div class="info-group">
+        <div class="label">Contact Phone</div>
+        <div class="value" th:text="${patient.phone}">555-0123</div>
+    </div>
+
+    <div class="info-group">
+        <div class="label">Address</div>
+        <div class="value" th:text="${patient.address}">123 Medical Way</div>
+    </div>
+
+    <div class="info-group" style="border: none;">
+        <div class="label">Primary Physician</div>
+        <div class="value" style="color: #38bdf8;" th:text="${patient.physicianName}">Dr. House</div>
+    </div>
+</div>
+
+</body>
+</html>

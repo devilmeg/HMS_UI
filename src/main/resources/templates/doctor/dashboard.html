@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Physician Command Suite | HMS</title>
+    <link rel="stylesheet" th:href="@{/css/monitor.css}">
+
+    <style>
+        :root {
+            --primary-blue: #3B82F6;
+            --navy-overlay: rgba(15, 23, 42, 0.85);
+            --glass-white: rgba(255, 255, 255, 0.9);
+        }
+
+        body {
+            margin: 0; padding: 40px;
+            font-family: 'Inter', sans-serif;
+            background-image: url('https://images.unsplash.com/photo-1629909613654-28e377c37b09?q=80&w=2070');
+            background-size: cover; background-attachment: fixed;
+            position: relative; min-height: 100vh;
+        }
+
+        /* Dark Blur Overlay */
+        body::before {
+            content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: var(--navy-overlay); backdrop-filter: blur(10px); z-index: -1;
+        }
+
+        /* Glassmorphism Data Card */
+        .data-card {
+            background: var(--glass-white);
+            backdrop-filter: blur(12px);
+            border-radius: 24px;
+            padding: 35px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+        }
+
+        /* Filter Ribbon - Glass Style */
+        .filter-ribbon {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(15px);
+            padding: 20px 30px;
+            border-radius: 20px;
+            margin-bottom: 30px;
+            display: flex; gap: 20px; align-items: center;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+        .form-group label { color: #E2E8F0; font-size: 0.7rem; font-weight: bold; text-transform: uppercase; }
+        .form-control { padding: 10px; border-radius: 10px; border: none; background: white; outline: none; }
+
+        /* Action Hub */
+        .action-hub { display: flex; gap: 15px; margin-bottom: 30px; }
+        .btn-outline {
+            background: rgba(255,255,255,0.1); border: 1px solid white;
+            color: white; padding: 10px 20px; border-radius: 12px;
+            text-decoration: none; font-weight: 600; transition: 0.3s;
+        }
+        .btn-outline:hover { background: white; color: #0F172A; }
+
+        /* Table Styling */
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th { text-align: left; padding: 15px; color: #64748B; border-bottom: 2px solid #F1F5F9; font-size: 0.8rem; text-transform: uppercase; }
+        td { padding: 15px; border-bottom: 1px solid #F1F5F9; color: #0F172A; font-size: 0.95rem; }
+
+        .badge-success { background: #DCFCE7; color: #16A34A; padding: 4px 12px; border-radius: 20px; font-weight: bold; font-size: 0.75rem; }
+        .btn-action { background: var(--primary-blue); color: white; border: none; padding: 8px 16px; border-radius: 8px; text-decoration: none; font-size: 0.8rem; cursor: pointer; transition: 0.2s; }
+        .btn-action:hover { background: #2563EB; transform: scale(1.05); }
+    </style>
+</head>
+<body>
+
+<div class="monitor-viewport" style="background: white !important;">
+    <div class="monitor-content">
+        <h1 th:text="'Dr. Dashboard | ' + ${physicianName ?: 'Specialist'}">Physician Dashboard</h1>
+        <p>> SESSION_ACTIVE | ID: <span th:text="${doctorId}"></span></p>
+    </div>
+    <div class="ekg-container">
+        <svg viewBox="0 0 1000 100" class="ekg-svg"><path d="M0 50 L150 50 L155 20 L160 80 L165 50 L1000 50" /></svg>
+    </div>
+</div>
+
+<form th:action="@{/ui/physician/filter}" method="post" class="filter-ribbon">
+    <input type="hidden" name="physicianId" th:value="${doctorId}">
+    <div class="form-group">
+        <label>Select Date</label>
+        <input type="date" name="filterDate" class="form-control"
+               th:value="${defaultDate}">
+    </div>
+    <div class="form-group">
+        <label>Category</label>
+        <select name="category" class="form-control">
+            <option value="APPOINTMENT" th:selected="${category == 'APPOINTMENT'}">Appointments</option>
+            <option value="PATIENT" th:selected="${category == 'PATIENT'}">My Patients</option>
+            <option value="TRAINING" th:selected="${category == 'TRAINING'}">Training</option>
+        </select>
+    </div>
+    <button type="submit" class="btn-action" style="margin-top:15px;">Apply Filter</button>
+</form>
+
+<div class="action-hub">
+    <a th:href="@{/ui/physician/{id}/all-patients(id=${doctorId})}" class="btn-outline">👥 My Patient List</a>
+    <a th:href="@{/}" class="btn-outline">🏠 Exit Portal</a>
+</div>
+
+<div class="data-card">
+    <h3 th:text="${currentViewTitle ?: 'Records View'}">Active View</h3>
+    <table>
+        <thead>
+        <tr th:if="${category == 'APPOINTMENT'}">
+            <th>Time</th><th>Patient</th><th>Room</th><th>Actions</th>
+        </tr>
+        <tr th:if="${category == 'PATIENT'}">
+            <th>SSN</th><th>Full Name</th><th>Phone</th><th>Actions</th>
+        </tr>
+        <tr th:if="${category == 'TRAINING'}">
+            <th>Procedure</th><th>Status</th><th>Avg Cost</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="row : ${results}">
+
+            <th:block th:if="${category == 'PATIENT'}">
+                <td th:text="${row[0]}">SSN</td>
+                <td th:text="${row[1]}">Full Name</td>
+                <td th:text="${row[2]}">Phone</td>
+                <td>
+                    <a th:href="@{/ui/physician/patient-details/{ssn}(ssn=${row[0]})}" class="btn-action">Records</a>
+                </td>
+            </th:block>
+
+            <th:block th:if="${category == 'APPOINTMENT'}">
+                <td th:text="${row[1]}">Time</td>
+                <td th:text="${row[0]}">Patient</td>
+                <td th:text="${row[2]}">Room</td>
+                <td>
+                    <a th:href="@{/ui/physician/patient-details/{ssn}(ssn=${row[3]})}" class="btn-action">History</a>
+                </td>
+            </th:block>
+        </tr>
+        </tbody>
+    </table>
+</div>
+
+</body>
+</html>

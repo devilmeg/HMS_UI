@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HMS | Executive Command Center v2.0</title>
+
+    <!-- ✅ ADD THIS -->
+    <link rel="stylesheet" th:href="@{/css/monitor.css}">
+
+    <style>
+        :root {
+            --primary-blue: #3B82F6;
+            --primary-hover: #2563EB;
+            --card-white: rgba(255, 255, 255, 0.95);
+            --text-dark: #0F172A;
+            --text-muted: #64748B;
+            --navy-overlay: rgba(15, 23, 42, 0.85);
+        }
+
+        body {
+            margin: 0;
+            padding: 40px;
+            font-family: 'Inter', system-ui, sans-serif;
+            color: var(--text-dark);
+            position: relative;
+            min-height: 100vh;
+
+            background-image: url('https://images.unsplash.com/photo-1629909613654-28e377c37b09?q=80&w=2070');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background-color: var(--navy-overlay);
+            backdrop-filter: blur(10px);
+            z-index: -1;
+        }
+
+        .portal-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 24px;
+            max-width: 1300px;
+            margin: 0 auto;
+        }
+
+        .portal-card {
+            background: var(--card-white);
+            border-radius: 20px;
+            padding: 40px 30px;
+            text-decoration: none;
+            color: inherit;
+            transition: 0.3s;
+        }
+
+        .portal-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 25px 50px rgba(0,0,0,0.3);
+            border: 1px solid var(--primary-blue);
+        }
+
+        .icon-box {
+            width: 54px;
+            height: 54px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 25px;
+            font-size: 24px;
+        }
+
+        .physician .icon-box { background: #DBEAFE; }
+        .patient .icon-box { background: #DCFCE7; }
+        .reception .icon-box { background: #FEF3C7; }
+        .admin .icon-box { background: #F3E8FF; }
+
+        .portal-card h2 {
+            margin: 0;
+            font-size: 1.3rem;
+        }
+
+        .portal-card p {
+            margin-top: 12px;
+            color: var(--text-muted);
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="monitor-viewport">
+    <div class="monitor-content">
+        <h1>HMS COMMAND CENTER</h1>
+        <p>> DOCTOR_ID:
+            <span th:text="${doctorId ?: '3 ( Turk, Christopher )'}"></span>
+            | STATUS: SECURE_ACCESS
+        </p>
+    </div>
+
+    <div class="ekg-container">
+        <svg viewBox="0 0 1000 100" preserveAspectRatio="none" class="ekg-svg">
+            <path d="M0 50 L100 50 L105 20 L110 80 L115 50 L250 50 L255 20 L260 80 L265 50 L400 50 L405 20 L410 80 L415 50 L550 50 L555 20 L560 80 L565 50 L750 50 L755 20 L760 80 L770 50 L900 50 L905 20 L910 80 L920 50 L1000 50" />
+        </svg>
+    </div>
+</div>
+
+<div class="portal-grid">
+
+    <a th:href="@{/ui/physician/3/dashboard}" class="portal-card physician">
+        <div class="icon-box">🩺</div>
+        <h2>Physician Portal</h2>
+        <p>Surgical training logs, diagnostics, and patient schedules.</p>
+    </a>
+
+    <!-- ✅ FIXED: Now goes to dashboard -->
+    <a th:href="@{/ui/patient/enter}" class="portal-card patient">
+        <div class="icon-box">📂</div>
+        <h2>Patient Records</h2>
+        <p>Full medical history, prescriptions, and billing details.</p>
+    </a>
+
+    <a th:href="@{/ui/reception/book}" class="portal-card reception">
+        <div class="icon-box">📅</div>
+        <h2>Reception Desk</h2>
+        <p>Appointment booking, registration, and check-ins.</p>
+    </a>
+
+    <a th:href="@{/ui/admin/status}" class="portal-card admin">
+        <div class="icon-box">⚙️</div>
+        <h2>Administration</h2>
+        <p>Hospital logistics, shift logs, and staff analytics.</p>
+    </a>
+
+</div>
+
+</body>
+</html>
