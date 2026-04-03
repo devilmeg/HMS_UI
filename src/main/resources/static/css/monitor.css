@@ -1,0 +1,204 @@
+/* 1. CORE THEME VARIABLES */
+:root {
+    --bg-main: #F8FAFC;       /* Ultra Light Blue/Gray */
+    --bg-section: #E2E8F0;    /* Section Divider */
+    --card-white: #FFFFFF;    /* Pure White Cards */
+    --primary-blue: #3B82F6;  /* Trust Blue */
+    --primary-hover: #2563EB;
+    --accent-green: #22C55E;  /* Health Green */
+    --text-dark: #0F172A;     /* Deep Slate Text */
+    --text-muted: #64748B;    /* Secondary Text */
+
+    /* Soft Pastel Backgrounds for Icons */
+    --physician-bg: #DBEAFE;
+    --patient-bg: #DCFCE7;
+    --reception-bg: #FEF3C7;
+    --admin-bg: #F3E8FF;
+}
+
+/* 2. GLOBAL STYLES */
+body {
+    background-color: var(--bg-main);
+    color: var(--text-dark);
+    font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
+    margin: 0;
+    padding: 40px;
+    line-height: 1.6;
+}
+
+/* 3. THE PREMIUM MONITOR (Command Center) */
+.monitor-viewport {
+    background: var(--card-white);
+    border-radius: 24px;
+    border: 1px solid #E2E8F0;
+    height: 200px;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+    margin-bottom: 50px;
+    display: flex;
+    align-items: center;
+    padding: 0 40px;
+}
+
+/* Subtle Blue Accent Bar at Top */
+.monitor-viewport::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 6px;
+    background: var(--primary-blue);
+}
+
+/* THE SMOOTH EKG WAVEFORM */
+.ekg-container {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0; left: 0;
+    z-index: 1;
+}
+
+.ekg-svg {
+    width: 200%; /* Double width for seamless scrolling */
+    height: 100%;
+    stroke: var(--primary-blue);
+    stroke-width: 2.5;
+    fill: none;
+    opacity: 0.1; /* Very subtle background pulse */
+    animation: ekg-scroll 12s linear infinite;
+}
+
+@keyframes ekg-scroll {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+}
+
+.monitor-content {
+    position: relative;
+    z-index: 10;
+}
+
+.monitor-content h1 {
+    margin: 0;
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--text-dark);
+    letter-spacing: -0.5px;
+}
+
+.monitor-content p {
+    margin: 10px 0 0 0;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.9rem;
+    color: var(--primary-blue);
+    font-weight: 600;
+}
+
+/* 4. THE PORTAL GRID & CARDS */
+.portal-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 24px;
+    max-width: 1300px;
+    margin: 0 auto;
+}
+
+.portal-card {
+    /* Change background from pure white to 85% transparent white */
+    background: rgba(255, 255, 255, 0.85);
+
+    /* The magic ingredient: Blurs the background behind the card */
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+
+    border-radius: 24px;
+    padding: 40px 30px;
+    text-decoration: none;
+    color: inherit;
+
+    /* Add a semi-transparent white border to define the edge */
+    border: 1px solid rgba(255, 255, 255, 0.4);
+
+    /* Use a softer, larger shadow for depth */
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+
+    transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+    display: flex;
+    flex-direction: column;
+}
+
+.portal-card:hover {
+    transform: translateY(-12px);
+    /* Make the card more opaque on hover */
+    background: rgba(255, 255, 255, 0.95);
+    box-shadow: 0 30px 60px rgba(0, 0, 0, 0.2);
+    border-color: var(--primary-blue);
+}
+
+/* ICON BOXES with Pastel Colors */
+.icon-box {
+    width: 54px;
+    height: 54px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 25px;
+    font-size: 24px;
+}
+
+.physician .icon-box { background: var(--physician-bg); color: #2563EB; }
+.patient .icon-box   { background: var(--patient-bg); color: #16A34A; }
+.reception .icon-box { background: var(--reception-bg); color: #D97706; }
+.admin .icon-box     { background: var(--admin-bg); color: #7C3AED; }
+
+.portal-card h2 {
+    margin: 0;
+    font-size: 1.35rem;
+    font-weight: 600;
+    color: var(--text-dark);
+}
+
+.portal-card p {
+    margin: 12px 0 0 0;
+    color: var(--text-muted);
+    font-size: 0.95rem;
+    line-height: 1.5;
+}
+
+/* 5. TABLE STYLES (For Dashboard Pages) */
+.data-card {
+    background: var(--card-white);
+    border-radius: 20px;
+    padding: 30px;
+    border: 1px solid #E2E8F0;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.02);
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+th {
+    text-align: left;
+    padding: 16px;
+    background: #F8FAFC;
+    color: var(--text-muted);
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    border-bottom: 1px solid #E2E8F0;
+}
+
+td {
+    padding: 16px;
+    border-bottom: 1px solid #F1F5F9;
+    color: var(--text-dark);
+    font-size: 0.95rem;
+}
+
+tr:hover {
+    background-color: #FBFDFF;
+}
