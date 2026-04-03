@@ -101,7 +101,8 @@
             <tr>
                 <th>Admission</th>
                 <th>Discharge</th>
-                <th>Room</th>
+                <th>Room Number</th>
+                <th>Room Type</th>
             </tr>
             </thead>
 
@@ -111,6 +112,7 @@
                 <td th:text="${record.admittedAt}"></td>
                 <td th:text="${record.dischargedAt}"></td>
                 <td th:text="${record.roomNumber}"></td>
+                <td th:text="${record.roomType}"></td>
             </tr>
             </tbody>
         </table>
