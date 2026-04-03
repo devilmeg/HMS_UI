@@ -1,0 +1,67 @@
+body {
+    color: white;
+}
+
+.table-container {
+    background: rgba(255,255,255,0.95);
+    color: black;
+    border-radius: 16px;
+    padding: 20px;
+    margin-top: 20px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th {
+    background: #3B82F6;
+    color: white;
+    padding: 12px;
+}
+
+td {
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+}
+
+tr:hover {
+    background: #f1f5f9;
+}
+
+.filter-bar {
+    margin: 20px 0;
+}
+
+input, select {
+    padding: 8px;
+    border-radius: 8px;
+    border: none;
+}
+
+button {
+    padding: 8px 12px;
+    background: #2563EB;
+    color: white;
+    border-radius: 8px;
+    border: none;
+}
+
+.pagination {
+    margin-top: 20px;
+}
+
+.pagination a {
+    margin: 5px;
+    padding: 8px 12px;
+    background: white;
+    color: black;
+    border-radius: 8px;
+    text-decoration: none;
+}
+
+.pagination a.active {
+    background: #3B82F6;
+    color: white;
+}
