@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Stay History | HMS</title>
+
+    <link rel="stylesheet" th:href="@{/css/monitor.css}">
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #0f172a, #1e293b);
+            color: white;
+        }
+
+        .container {
+            padding: 40px;
+        }
+
+        h1 {
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: #94a3b8;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.05); /* darker glass */
+            backdrop-filter: blur(12px);
+            border-radius: 14px;
+            padding: 20px;
+            width: 500px;
+            border: 1px solid rgba(255,255,255,0.08);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+        }
+
+        /* 🔥 FIXED HEADER */
+        th {
+            color: #38bdf8;
+            background: transparent; /* remove white */
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+
+        /* 🔥 FIXED TEXT VISIBILITY */
+        td {
+            color: #e2e8f0;
+        }
+
+        /* 🔥 CLEAN ROW STYLE */
+        tr {
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+        }
+
+        tr:hover {
+            background: rgba(56,189,248,0.08); /* blue hover like history */
+        }
+
+        .back-btn {
+            display: inline-block;
+            margin-bottom: 20px;
+            padding: 8px 14px;
+            border: 1px solid #38bdf8;
+            border-radius: 8px;
+            color: #38bdf8;
+            text-decoration: none;
+        }
+
+        .back-btn:hover {
+            background: #38bdf8;
+            color: black;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <!-- BACK BUTTON -->
+    <a th:href="@{/ui/patient/dashboard(id=${patientId})}" class="back-btn">
+        ← Back to Dashboard
+    </a>
+
+    <h1>Stay History</h1>
+    <p class="subtitle">Patient ID: <span th:text="${patientId}"></span></p>
+
+    <div class="card">
+        <table>
+            <thead>
+            <tr>
+                <th>Admission</th>
+                <th>Discharge</th>
+                <th>Room Number</th>
+                <th>Room Type</th>
+            </tr>
+            </thead>
+
+            <tbody>
+            <tr th:each="record : ${stayHistory}">
+                <!-- ✅ IMPORTANT: match your DTO fields -->
+                <td th:text="${record.admittedAt}"></td>
+                <td th:text="${record.dischargedAt}"></td>
+                <td th:text="${record.roomNumber}"></td>
+                <td th:text="${record.roomType}"></td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+</div>
+
+</body>
+</html>
