@@ -1,0 +1,17 @@
+<div th:fragment="superPagination(baseUrl, response)">
+  <div class="flex gap-2 mt-4">
+
+    <a th:if="${response.currentPage > 0}"
+       th:href="@{${baseUrl}(page=${response.currentPage - 1})}">
+      Prev
+    </a>
+
+    <span>Page [[${response.currentPage + 1}]] / [[${response.totalPages}]]</span>
+
+    <a th:if="${response.currentPage < response.totalPages - 1}"
+       th:href="@{${baseUrl}(page=${response.currentPage + 1})}">
+      Next
+    </a>
+
+  </div>
+</div>

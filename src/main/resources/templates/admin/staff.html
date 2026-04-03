@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <title>Hospital Staff</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <style>
+    @keyframes floatUp {
+      0% { transform: translateY(0); }
+      50% { transform: translateY(-5px); }
+      100% { transform: translateY(0); }
+    }
+    .float-card:hover {
+      animation: floatUp 0.5s ease-in-out;
+    }
+  </style>
+</head>
+
+<body class="bg-gradient-to-br from-slate-900 via-blue-950 to-slate-900 text-white p-10">
+
+<div class="max-w-7xl mx-auto">
+
+  <!-- HEADER -->
+  <div class="flex justify-between items-center mb-8">
+    <div>
+      <h1 class="text-3xl font-bold">Hospital Staff</h1>
+      <p class="text-slate-400 text-sm">Manage doctors & departments</p>
+    </div>
+
+    <a href="/ui/admin/dashboard"
+       class="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded shadow">
+      🏠 Home
+    </a>
+  </div>
+
+  <!-- FILTERS -->
+  <div class="mb-6 grid grid-cols-6 gap-4">
+
+    <input id="searchName" type="text"
+           placeholder="Search Name..."
+           class="p-3 rounded bg-white/10 border border-white/20 backdrop-blur text-white"/>
+
+    <select id="filterRole" class="p-3 rounded bg-gray-800 border border-gray-700">
+      <option value="">All Roles</option>
+      <option value="Physician">Physician</option>
+    </select>
+
+    <input id="filterPosition" type="text"
+           placeholder="Position..."
+           class="p-3 rounded bg-white/10 border border-white/20"/>
+
+    <input id="filterDepartment" type="text"
+           placeholder="Department..."
+           class="p-3 rounded bg-white/10 border border-white/20"/>
+
+    <select id="filterPrimary" class="p-3 rounded bg-gray-800 border border-gray-700">
+      <option value="">Primary</option>
+      <option value="YES">YES</option>
+      <option value="NO">NO</option>
+    </select>
+
+    <select id="filterHead" class="p-3 rounded bg-gray-800 border border-gray-700">
+      <option value="">Head</option>
+      <option value="HEAD">HEAD</option>
+      <option value="-">NO</option>
+    </select>
+
+  </div>
+
+  <!-- TABLE -->
+  <div class="bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl shadow-xl overflow-hidden">
+
+    <table class="w-full text-sm text-left">
+
+      <thead class="bg-black/40 text-gray-300">
+      <tr>
+        <th class="p-4">Name</th>
+        <th class="p-4">Role</th>
+        <th class="p-4">Position</th>
+        <th class="p-4">Department</th>
+        <th class="p-4 text-center">Primary</th>
+        <th class="p-4 text-center">Head</th>
+      </tr>
+      </thead>
+
+      <tbody>
+
+      <tr th:each="s : ${response.data}"
+          class="border-b border-gray-800 hover:bg-white/5 transition float-card staff-row">
+
+        <td class="p-4 font-semibold name" th:text="${s.name}"></td>
+
+        <td class="p-4 role">
+          <span th:text="${s.role}"
+                class="bg-blue-500/20 text-blue-400 px-2 py-1 rounded text-xs"></span>
+        </td>
+
+        <td class="p-4 text-slate-300 position" th:text="${s.position}"></td>
+
+        <td class="p-4 text-slate-300 department" th:text="${s.departmentName}"></td>
+
+        <td class="p-4 text-center primary">
+          <span th:if="${s.primaryAffiliation}"
+                class="bg-green-500/20 text-green-400 px-2 py-1 rounded-full text-xs">YES</span>
+          <span th:unless="${s.primaryAffiliation}"
+                class="bg-gray-700 text-gray-300 px-2 py-1 rounded-full text-xs">NO</span>
+        </td>
+
+        <td class="p-4 text-center head">
+          <span th:if="${s.isDepartmentHead}"
+                class="bg-yellow-500/20 text-yellow-400 px-2 py-1 rounded-full text-xs">HEAD</span>
+          <span th:unless="${s.isDepartmentHead}" class="text-gray-500">-</span>
+        </td>
+
+      </tr>
+
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 🔥 PAGINATION -->
+  <div class="flex justify-between items-center mt-6">
+
+    <!-- PREV -->
+    <a th:if="${response.currentPage > 0}"
+       th:href="@{${baseUrl}(page=${response.currentPage - 1}, size=${size})}"
+       class="px-4 py-2 bg-gray-800 rounded hover:bg-gray-700">
+      ⬅ Prev
+    </a>
+
+    <!-- PAGE INFO -->
+    <span class="text-gray-300">
+      Page [[${response.currentPage + 1}]] of [[${response.totalPages}]]
+    </span>
+
+    <!-- NEXT -->
+    <a th:if="${response.currentPage < response.totalPages - 1}"
+       th:href="@{${baseUrl}(page=${response.currentPage + 1}, size=${size})}"
+       class="px-4 py-2 bg-gray-800 rounded hover:bg-gray-700">
+      Next ➡
+    </a>
+
+  </div>
+
+</div>
+
+<!-- FILTER SCRIPT -->
+<script>
+  const inputs = document.querySelectorAll("#searchName, #filterRole, #filterPosition, #filterDepartment, #filterPrimary, #filterHead");
+  const rows = document.querySelectorAll(".staff-row");
+
+  function filterTable() {
+    const values = Array.from(inputs).map(i => i.value.toLowerCase());
+
+    rows.forEach(row => {
+      const text = row.innerText.toLowerCase();
+      row.style.display = values.every(v => text.includes(v)) ? "" : "none";
+    });
+  }
+
+  inputs.forEach(i => i.addEventListener("input", filterTable));
+</script>
+
+</body>
+</html>

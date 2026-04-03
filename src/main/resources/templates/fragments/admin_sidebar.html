@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <title>Staff Management</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 flex min-h-screen">
+<aside th:replace="~{fragments/admin_sidebar :: sidebar}"></aside>
+
+<main class="flex-1 p-8">
+  <div class="flex justify-between items-center mb-6">
+    <h1 class="text-2xl font-bold text-gray-800">Hospital Staff Directory</h1>
+    <a href="/" class="text-blue-600 hover:text-blue-800 font-medium">← Back to Home</a>
+  </div>
+
+  <div class="bg-white p-4 rounded-lg shadow-sm mb-6 flex gap-4">
+    <input type="text" id="searchInput" placeholder="Search staff by name..."
+           class="flex-1 border rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 outline-none">
+    <button class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition">Search</button>
+  </div>
+
+  <div class="bg-white rounded-lg shadow-sm overflow-hidden">
+    <table class="w-full text-left">
+      <thead class="bg-gray-100 border-b">
+      <tr>
+        <th class="px-6 py-3 text-sm font-semibold text-gray-600">Name</th>
+        <th class="px-6 py-3 text-sm font-semibold text-gray-600">Role</th>
+        <th class="px-6 py-3 text-sm font-semibold text-gray-600">Department</th>
+        <th class="px-6 py-3 text-sm font-semibold text-gray-600">Head Status</th>
+      </tr>
+      </thead>
+      <tbody class="divide-y divide-gray-200">
+      <tr th:each="staff : ${staffData.data}" class="hover:bg-gray-50 transition">
+        <td class="px-6 py-4 font-medium text-gray-900" th:text="${staff.name}">Aniket</td>
+        <td class="px-6 py-4 text-gray-600" th:text="${staff.role}">Doctor</td>
+        <td class="px-6 py-4 text-gray-600" th:text="${staff.departmentName}">Cardiology</td>
+        <td class="px-6 py-4">
+          <span th:if="${staff.isDepartmentHead}" class="bg-green-100 text-green-700 px-2 py-1 rounded-full text-xs">Dept Head</span>
+          <span th:unless="${staff.isDepartmentHead}" class="text-gray-400 text-xs">Member</span>
+        </td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div th:replace="~{fragments/pagination :: superPagination(${baseUrl}, ${staffData})}"></div>
+</main>
+</body>
+</html>
+</body>
+</html>

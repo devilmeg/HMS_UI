@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <title>System Logs</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- 🔥 CUSTOM ANIMATION (Converted from your CSS) -->
+  <style>
+    @keyframes ekg-scroll {
+        from { transform: translateX(0); }
+        to { transform: translateX(-50%); }
+    }
+
+    .ekg-animate {
+        animation: ekg-scroll 12s linear infinite;
+    }
+  </style>
+
+</head>
+
+<body class="bg-gradient-to-br from-gray-900 via-blue-950 to-gray-900 text-white p-8">
+
+<div class="max-w-7xl mx-auto">
+
+  <!-- 🔥 MONITOR HEADER (FROM YOUR CSS) -->
+  <div class="relative bg-white/10 backdrop-blur-xl rounded-2xl border border-white/20 shadow-lg mb-8 overflow-hidden">
+
+    <!-- Top Accent -->
+    <div class="absolute top-0 left-0 w-full h-1 bg-blue-500"></div>
+
+    <!-- EKG Animation -->
+    <div class="absolute inset-0 opacity-10">
+      <svg class="w-[200%] h-full ekg-animate" viewBox="0 0 1000 100" preserveAspectRatio="none">
+        <polyline points="0,50 100,50 120,20 140,80 160,50 300,50 320,20 340,80 360,50 1000,50"
+                  stroke="#3B82F6" stroke-width="2" fill="none"/>
+      </svg>
+    </div>
+
+    <!-- Content -->
+    <div class="relative z-10 p-6 flex justify-between items-center">
+      <div>
+        <h1 class="text-2xl font-bold">System Logs</h1>
+        <p class="text-blue-400 text-sm font-mono">LIVE MONITORING ACTIVE</p>
+      </div>
+
+      <a href="/ui/admin/dashboard"
+         class="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded">
+        🏠 Home
+      </a>
+    </div>
+  </div>
+
+  <!-- ERROR -->
+  <div th:if="${response != null and response.status != 'SUCCESS'}"
+       class="bg-red-500/20 border border-red-500 text-red-300 p-3 rounded mb-4">
+    <span th:text="${response.message}"></span>
+  </div>
+
+  <!-- FILTER -->
+  <form method="get" th:action="@{/ui/admin/logs}" class="mb-4">
+    <select name="level"
+            onchange="this.form.submit()"
+            class="bg-gray-800 text-white p-2 rounded">
+
+      <option value="">ALL</option>
+      <option value="INFO" th:selected="${selectedLevel=='INFO'}">INFO</option>
+      <option value="DEBUG" th:selected="${selectedLevel=='DEBUG'}">DEBUG</option>
+      <option value="WARN" th:selected="${selectedLevel=='WARN'}">WARN</option>
+      <option value="ERROR" th:selected="${selectedLevel=='ERROR'}">ERROR</option>
+
+    </select>
+
+    <input type="hidden" name="size" value="5"/>
+  </form>
+
+  <!-- 🔥 GLASS CARD (Converted portal-card) -->
+  <div class="bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl shadow-xl p-6">
+
+    <!-- HEADINGS -->
+    <div class="grid grid-cols-3 text-gray-400 text-sm border-b border-gray-700 pb-2 mb-2">
+      <span>Date</span>
+      <span>Level</span>
+      <span>Message</span>
+    </div>
+
+    <!-- DATA -->
+    <div th:if="${response != null and response.data != null}">
+
+      <div th:each="log : ${response.data}"
+           class="grid grid-cols-3 gap-4 border-b border-gray-800 py-3 hover:bg-white/5 transition">
+
+                <span class="text-gray-400"
+                      th:text="${log.time} ?: 'N/A'"></span>
+
+        <span th:text="${log.level}"
+              th:classappend="${log.level=='ERROR'?'text-red-400':
+                                       (log.level=='WARN'?'text-yellow-400':
+                                       (log.level=='DEBUG'?'text-green-400':'text-blue-400'))}">
+                </span>
+
+        <span class="text-gray-200 break-words"
+              th:text="${log.message}"></span>
+
+      </div>
+
+    </div>
+
+    <!-- EMPTY -->
+    <div th:if="${response == null or response.data == null or #lists.isEmpty(response.data)}"
+         class="text-gray-500 text-center py-6">
+      No logs available
+    </div>
+
+  </div>
+
+  <!-- PAGINATION -->
+  <div class="flex justify-between items-center mt-6">
+
+    <a th:if="${response.currentPage > 0}"
+       th:href="@{/ui/admin/logs(page=${response.currentPage - 1}, size=5, level=${selectedLevel})}"
+       class="bg-gray-800 px-4 py-2 rounded hover:bg-gray-700">
+      ⬅ Prev
+    </a>
+
+    <span>
+            Page [[${response.currentPage + 1}]] of [[${response.totalPages}]]
+        </span>
+
+    <a th:if="${response.currentPage < response.totalPages - 1}"
+       th:href="@{/ui/admin/logs(page=${response.currentPage + 1}, size=5, level=${selectedLevel})}"
+       class="bg-gray-800 px-4 py-2 rounded hover:bg-gray-700">
+      Next ➡
+    </a>
+
+  </div>
+
+  <!-- JUMP -->
+  <div class="mt-4">
+    <form method="get" th:action="@{/ui/admin/logs}" class="flex gap-2">
+
+      <input type="number"
+             name="page"
+             class="bg-gray-800 p-2 rounded w-32"
+             placeholder="Go to page"/>
+
+      <input type="hidden" name="size" value="5"/>
+      <input type="hidden" name="level" th:value="${selectedLevel}"/>
+
+      <button class="bg-blue-600 px-3 py-2 rounded hover:bg-blue-700">
+        Go
+      </button>
+    </form>
+  </div>
+
+</div>
+
+</body>
+</html>
