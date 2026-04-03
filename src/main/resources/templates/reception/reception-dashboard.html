@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Reception Command Suite | HMS</title>
+    <link rel="stylesheet" th:href="@{/css/monitor.css}">
+
+    <style>
+        :root {
+            --primary-blue: #3B82F6;
+            --navy-overlay: rgba(15, 23, 42, 0.85);
+            --glass-white: rgba(255, 255, 255, 0.9);
+        }
+
+        body {
+            margin: 0; padding: 40px;
+            font-family: 'Inter', sans-serif;
+            background-image: url('https://images.unsplash.com/photo-1629909613654-28e377c37b09?q=80&w=2070');
+            background-size: cover;
+            background-attachment: fixed;
+            position: relative;
+            min-height: 100vh;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            background: var(--navy-overlay);
+            backdrop-filter: blur(10px);
+            z-index: -1;
+        }
+
+        .data-card {
+            background: var(--glass-white);
+            border-radius: 24px;
+            padding: 35px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+        }
+
+        .filter-ribbon {
+            background: rgba(255,255,255,0.15);
+            padding: 20px;
+            border-radius: 20px;
+            margin-bottom: 30px;
+            display: flex;
+            gap: 20px;
+            align-items: center;
+            color: white;
+        }
+
+        .form-control {
+            padding: 10px;
+            border-radius: 10px;
+            border: none;
+        }
+
+        .btn-outline {
+            padding: 10px 20px;
+            border-radius: 12px;
+            border: 1px solid white;
+            color: white;
+            background: transparent;
+            cursor: pointer;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            padding: 12px;
+            color: #64748B;
+            border-bottom: 2px solid #ddd;
+        }
+
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #eee;
+        }
+    </style>
+</head>
+
+<body>
+<!--changeable-->
+<div class="monitor-viewport">
+
+    <div class="monitor-content">
+
+        <h1>Reception Dashboard</h1>
+        <p>
+            &gt; RECEPTION_ID:
+            <span th:text="${receptionId}"></span>
+            | STATUS: ACTIVE_SESSION
+        </p>
+    </div>
+
+    <div class="ekg-container">
+        <svg viewBox="0 0 1000 100" preserveAspectRatio="none" class="ekg-svg">
+            <path d="M0 50 L100 50 L105 20 L110 80 L115 50 L250 50 L255 20 L260 80 L265 50 L400 50 L405 20 L410 80 L415 50 L550 50 L555 20 L560 80 L565 50 L750 50 L755 20 L760 80 L770 50 L900 50 L905 20 L910 80 L920 50 L1000 50"/>
+        </svg>
+    </div>
+
+</div>
+
+<!-- HEADER -->
+<!--<div class="monitor-viewport" style="background: white;">-->
+<!--    <div class="monitor-content">-->
+<!--        <h1>Reception Dashboard</h1>-->
+<!--        <p>> SESSION_ACTIVE | ID: <span th:text="${receptionId}"></span></p>-->
+<!--    </div>-->
+<!--</div>-->
+
+<!-- FILTER -->
+<form th:action="@{/ui/reception/{id}/dashboard(id=${receptionId})}" method="get" class="filter-ribbon">
+
+    <!-- DATE -->
+    <div>
+        <label>Select Date</label>
+        <input type="date"
+               name="date"
+               class="form-control"
+               th:value="${defaultDate}"
+               th:disabled="${category != 'appointments'}">
+    </div>
+
+    <!-- CATEGORY -->
+    <div>
+        <label>Category</label>
+        <select name="category" class="form-control" onchange="this.form.submit()">
+            <option value="rooms" th:selected="${category == 'rooms'}">Rooms</option>
+            <option value="appointments" th:selected="${category == 'appointments'}">Appointments</option>
+            <option value="nurses" th:selected="${category == 'nurses'}">Nurses</option>
+        </select>
+    </div>
+<!-- SORTING-->
+    <div>
+        <label>Sort By</label>
+        <select name="sortBy" class="form-control">
+            <option value="">None</option>
+            <option value="name">Name</option>
+            <option value="date">Date</option>
+        </select>
+    </div>
+
+    <div>
+        <label>Order</label>
+        <select name="order" class="form-control">
+            <option value="asc">Ascending</option>
+            <option value="desc">Descending</option>
+        </select>
+    </div>
+
+    <button type="submit" class="btn-outline">Apply</button>
+</form>
+
+<!-- EXIT -->
+<div style="margin-bottom:20px;">
+    <a th:href="@{/}" class="btn-outline">🏠 Exit Portal</a>
+</div>
+
+<!-- DATA -->
+<div class="data-card">
+
+    <h3 th:text="${currentViewTitle}">Data</h3>
+
+    <table>
+
+        <!-- HEADERS -->
+
+        <!-- ROOMS -->
+        <tr th:if="${category == 'rooms'}">
+            <th>Room Number</th>
+            <th>Status</th>
+        </tr>
+
+        <!-- APPOINTMENTS -->
+        <tr th:if="${category == 'appointments'}">
+            <th>Patient</th>
+            <th>Doctor</th>
+            <th>Room</th>
+            <th>Time</th>
+        </tr>
+
+        <!-- NURSES -->
+        <tr th:if="${category == 'nurses'}">
+            <th>Name</th>
+            <th>Floor</th>
+            <th>Block</th>
+            <th>Start</th>
+            <th>End</th>
+        </tr>
+
+        <!-- DATA ROW -->
+        <tr th:each="item : ${results}">
+
+            <!-- ROOMS -->
+            <th:block th:if="${category == 'rooms'}">
+                <td th:text="${item.roomNumber}"></td>
+                <td th:text="${item.status}"></td>
+            </th:block>
+
+            <!-- APPOINTMENTS -->
+            <th:block th:if="${category == 'appointments'}">
+                <td th:text="${item.patientName}"></td>
+                <td th:text="${item.physicianName}"></td>
+                <td th:text="${item.examinationRoom}"></td>
+                <td th:text="${item.appointmentTime}"></td>
+            </th:block>
+
+            <!-- NURSES -->
+            <th:block th:if="${category == 'nurses'}">
+                <td th:text="${item.nurseName}"></td>
+                <td th:text="${item.blockFloor}"></td>
+                <td th:text="${item.blockCode}"></td>
+                <td th:text="${item.start}"></td>
+                <td th:text="${item.end}"></td>
+            </th:block>
+
+        </tr>
+
+        <!-- NO DATA (APPOINTMENT) -->
+        <tr th:if="${category == 'appointments'} and ${#lists.isEmpty(results)}">
+            <td colspan="5" style="text-align:center; color:red; font-weight:bold;">
+                No Data Found on this Date
+            </td>
+        </tr>
+
+        <!-- NO DATA (OTHERS) -->
+        <tr th:if="${category != 'appointments'} and ${#lists.isEmpty(results)}">
+            <td colspan="5" style="text-align:center;">
+                No Data Available
+            </td>
+        </tr>
+
+    </table>
+
+</div>
+
+</body>
+</html>
