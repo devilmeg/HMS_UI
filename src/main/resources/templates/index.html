@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HMS | Executive Command Center v2.0</title>
+    <style>
+        /* CORE THEME & BACKGROUND STRATEGY */
+        :root {
+            --primary-blue: #3B82F6;
+            --primary-hover: #2563EB;
+            --card-white: rgba(255, 255, 255, 0.95); /* Semi-transparent White */
+            --text-dark: #0F172A;
+            --text-muted: #64748B;
+            --navy-overlay: rgba(15, 23, 42, 0.85); /* Deep Navy Overlay */
+        }
+
+        body {
+            margin: 0;
+            padding: 40px;
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            color: var(--text-dark);
+            position: relative;
+            min-height: 100vh;
+
+            /* BACKGROUND IMAGE Strategy */
+            background-image: url('https://images.unsplash.com/photo-1629909613654-28e377c37b09?q=80&w=2070');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed; /* Parallax effect */
+        }
+
+        /* The DARK NAVY & BLUR OVERLAY */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-color: var(--navy-overlay);
+            backdrop-filter: blur(10px); /* Blurs the background image */
+            z-index: -1; /* Puts it behind everything */
+        }
+
+        /* 1. THE GLASSMORPHISM MONITOR (Command Center) */
+        .monitor-viewport {
+            background: rgba(255, 255, 255, 0.98);
+            border-radius: 24px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            height: 220px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.3);
+            margin-bottom: 50px;
+            display: flex;
+            align-items: center;
+            padding: 0 40px;
+        }
+
+        .monitor-viewport::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 6px;
+            background: var(--primary-blue);
+        }
+
+        /* PROFESSIONAL EKG WAVEFORM */
+        .ekg-container {
+            width: 100%; height: 100%;
+            position: absolute; top: 0; left: 0;
+        }
+
+        .ekg-svg {
+            width: 200%; height: 100%;
+            stroke: var(--primary-blue);
+            stroke-width: 2.5;
+            fill: none;
+            opacity: 0.15;
+            animation: ekg-scroll 12s linear infinite;
+        }
+
+        @keyframes ekg-scroll {
+            from { transform: translateX(0); }
+            to { transform: translateX(-50%); }
+        }
+
+        .monitor-content {
+            position: relative;
+            z-index: 10;
+        }
+
+        .monitor-content h1 {
+            margin: 0;
+            font-size: 1.8rem;
+            color: var(--text-dark);
+            letter-spacing: -0.5px;
+        }
+
+        .monitor-content p {
+            margin: 10px 0 0 0;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+            color: var(--primary-blue);
+            font-weight: 600;
+        }
+
+        /* 2. THE GRID & MODERNS SaaS CARDS */
+        .portal-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 24px;
+            max-width: 1300px;
+            margin: 0 auto;
+        }
+
+        .portal-card {
+            background: var(--card-white);
+            border-radius: 20px;
+            padding: 40px 30px;
+            text-decoration: none;
+            color: inherit;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .portal-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.3);
+            background: rgba(255, 255, 255, 1);
+            border-color: var(--primary-blue);
+        }
+
+        /* ICON BOXES (Soft Pastels) */
+        .icon-box {
+            width: 54px; height: 54px;
+            border-radius: 14px;
+            display: flex; align-items: center; justify-content: center;
+            margin-bottom: 25px;
+            font-size: 24px;
+        }
+
+        .physician .icon-box { background: #DBEAFE; color: #2563EB; }
+        .patient   .icon-box { background: #DCFCE7; color: #16A34A; }
+        .reception .icon-box { background: #FEF3C7; color: #D97706; }
+        .admin     .icon-box { background: #F3E8FF; color: #7C3AED; }
+
+        .portal-card h2 { margin: 0; font-size: 1.3rem; }
+        .portal-card p { margin-top: 12px; color: var(--text-muted); font-size: 0.95rem; line-height: 1.5; }
+    </style>
+</head>
+<body>
+
+<div class="monitor-viewport">
+    <div class="monitor-content">
+        <h1>HMS COMMAND CENTER</h1>
+    </div>
+
+    <div class="ekg-container">
+        <svg viewBox="0 0 1000 100" preserveAspectRatio="none" class="ekg-svg">
+            <path d="M0 50 L100 50 L105 20 L110 80 L115 50 L250 50 L255 20 L260 80 L265 50 L400 50 L405 20 L410 80 L415 50 L550 50 L555 20 L560 80 L565 50 L750 50 L755 20 L760 80 L770 50 L900 50 L905 20 L910 80 L920 50 L1000 50" />
+        </svg>
+    </div>
+</div>
+
+<div class="portal-grid">
+    <a th:href="@{/physician-login}" class="portal-card physician">
+        <div class="icon-box">🩺</div>
+        <h2>Physician Portal</h2>
+        <p>Surgical training logs, diagnostics, and patient schedules.</p>
+    </a>
+
+    <a th:href="@{/ui/patient/100000001/history}" class="portal-card patient">
+        <div class="icon-box">📂</div>
+        <h2>Patient Records</h2>
+        <p>Full medical history, prescriptions, and billing details.</p>
+    </a>
+
+    <a th:href="@{/ui/reception/1/dashboard}" class="portal-card reception">
+        <div class="icon-box">📅</div>
+        <h2>Reception Desk</h2>
+        <p>Appointment booking, registration, and check-ins.</p>
+    </a>
+
+    <a th:href="@{/ui/admin/status}" class="portal-card admin">
+        <div class="icon-box">⚙️</div>
+        <h2>Administration</h2>
+        <p>Hospital logistics, shift logs, and staff analytics.</p>
+    </a>
+</div>
+
+</body>
+</html>
