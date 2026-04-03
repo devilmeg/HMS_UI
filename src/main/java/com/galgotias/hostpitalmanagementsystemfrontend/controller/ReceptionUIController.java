@@ -1,3 +1,5 @@
+
+
 package com.galgotias.hostpitalmanagementsystemfrontend.controller;
 
 import com.galgotias.hostpitalmanagementsystemfrontend.service.ReceptionService;
@@ -8,7 +10,10 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
 
 @Controller
 @RequestMapping("/ui/reception")
@@ -22,11 +27,13 @@ public class ReceptionUIController {
 
     @GetMapping("/{id}/dashboard")
     public String showDashboard(
-//            @PathVariable Integer id,
-            @PathVariable("id") Integer id,@RequestParam(name = "category", defaultValue = "rooms") String category,
-            @RequestParam(name = "date", required = false) String date,
-            @RequestParam(name = "sortBy", required = false) String sortBy,
-            @RequestParam(name = "order", defaultValue = "asc") String order,
+            @PathVariable Integer id,
+            @RequestParam(defaultValue = "rooms") String category,
+            @RequestParam(required = false) String date,
+            @RequestParam(required = false) String sortBy,
+            @RequestParam(defaultValue = "asc") String order,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "5") int size,
             Model model) {
 
         List<Map<String, Object>> results;
@@ -52,42 +59,25 @@ public class ReceptionUIController {
             model.addAttribute("currentViewTitle", "Room Status");
         }
 
-        // SORTING LOGIC
-//        if (sortBy != null && !sortBy.isEmpty()) {
-//            results.sort((a, b) -> {
-//                Object valA = a.get(sortBy);
-//                Object valB = b.get(sortBy);
-//
-//                if (valA == null || valB == null) return 0;
-//
-//                int cmp = valA.toString().compareToIgnoreCase(valB.toString());
-//                return "desc".equalsIgnoreCase(order) ? -cmp : cmp;
-//            });
-//        }
+        results = new ArrayList<>(results);
 
-        // SORTING LOGIC (FIXED)
+        // SORTING
         Comparator<Map<String, Object>> comparator = null;
 
         if ("rooms".equalsIgnoreCase(category)) {
-
             comparator = Comparator.comparing(
                     m -> Integer.parseInt(m.get("roomNumber").toString())
             );
-
         } else if ("appointments".equalsIgnoreCase(category)) {
-
             comparator = Comparator.comparing(
                     m -> m.get("patientName").toString().toLowerCase()
             );
-
         } else if ("nurses".equalsIgnoreCase(category)) {
-
             comparator = Comparator.comparing(
-                    m -> m.get("nurseName").toString().toLowerCase()   // ✅ FIX HERE
+                    m -> m.get("nurseName").toString().toLowerCase()
             );
         }
 
-// APPLY ASC / DESC
         if (comparator != null) {
             if ("desc".equalsIgnoreCase(order)) {
                 results.sort(comparator.reversed());
@@ -96,12 +86,33 @@ public class ReceptionUIController {
             }
         }
 
-        model.addAttribute("results", results);
+        // Paging
+        int totalItems = results.size();
+
+        int start = page * size;
+        int end = Math.min(start + size, totalItems);
+
+        // SAFETY FIX
+        if (start >= totalItems) {
+            start = 0;
+            end = Math.min(size, totalItems);
+        }
+
+        List<Map<String, Object>> paginatedList =
+                new ArrayList<>(results.subList(start, end));
+
+
+        model.addAttribute("results", paginatedList);
+
         model.addAttribute("receptionId", id);
         model.addAttribute("category", category);
         model.addAttribute("defaultDate", date);
         model.addAttribute("sortBy", sortBy);
         model.addAttribute("order", order);
+
+        model.addAttribute("currentPage", page);
+        model.addAttribute("totalPages", (int) Math.ceil((double) totalItems / size));
+        model.addAttribute("size", size);
 
         return "reception/reception-dashboard";
     }

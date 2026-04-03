@@ -236,6 +236,44 @@
         </tr>
 
     </table>
+<!--        PAGING-->
+    <div style="margin-top:20px; text-align:center;">
+
+        <!-- PREVIOUS -->
+        <a th:if="${currentPage > 0}"
+           th:href="@{/ui/reception/{id}/dashboard(
+            id=${receptionId},
+            category=${category},
+            page=${currentPage - 1},
+            size=${size},
+            sortBy=${sortBy},
+            order=${order},
+            date=${defaultDate}
+       )}">
+            ◀ Prev
+        </a>
+
+        <!-- PAGE INFO -->
+        <span style="margin: 0 10px;">
+        Page <span th:text="${currentPage + 1}"></span> /
+        <span th:text="${totalPages}"></span>
+    </span>
+
+        <!-- NEXT -->
+        <a th:if="${currentPage + 1 < totalPages}"
+           th:href="@{/ui/reception/{id}/dashboard(
+            id=${receptionId},
+            category=${category},
+            page=${currentPage + 1},
+            size=${size},
+            sortBy=${sortBy},
+            order=${order},
+            date=${defaultDate}
+       )}">
+            Next ▶
+        </a>
+
+    </div>
 
 </div>
 

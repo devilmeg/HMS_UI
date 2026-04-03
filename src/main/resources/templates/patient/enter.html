@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Enter Patient SSN</title>
+
+    <style>
+        body {
+            display:flex;
+            justify-content:center;
+            align-items:center;
+            height:100vh;
+            background:#0f172a;
+            color:white;
+            font-family:Inter;
+        }
+
+        .box {
+            background: rgba(255,255,255,0.1);
+            padding:30px;
+            border-radius:12px;
+        }
+
+        input {
+            padding:10px;
+            margin-top:10px;
+            width:200px;
+        }
+
+        button {
+            margin-top:10px;
+            padding:10px;
+            background:#3B82F6;
+            border:none;
+            color:white;
+            cursor:pointer;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="box">
+    <h2>Enter Patient SSN</h2>
+
+    <form th:action="@{/ui/patient/dashboard}" method="get">
+        <input type="text" name="id" placeholder="Enter SSN" required />
+        <br>
+        <button type="submit">Go</button>
+        <p th:if="${error}" style="color:#f87171; margin-top:10px;">
+            <span th:text="${error}"></span>
+        </p>
+    </form>
+</div>
+
+</body>
+</html>
