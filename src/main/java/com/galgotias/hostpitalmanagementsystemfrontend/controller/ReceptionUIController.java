@@ -1,5 +1,3 @@
-
-
 package com.galgotias.hostpitalmanagementsystemfrontend.controller;
 
 import com.galgotias.hostpitalmanagementsystemfrontend.service.ReceptionService;
@@ -27,19 +25,19 @@ public class ReceptionUIController {
 
     @GetMapping("/{id}/dashboard")
     public String showDashboard(
-            @PathVariable Integer id,
-            @RequestParam(defaultValue = "rooms") String category,
-            @RequestParam(required = false) String date,
-            @RequestParam(required = false) String sortBy,
-            @RequestParam(defaultValue = "asc") String order,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "5") int size,
+            @PathVariable("id") Integer id, // Fixed
+            @RequestParam(value = "category", defaultValue = "rooms") String category, // Fixed
+            @RequestParam(value = "date", required = false) String date, // Fixed
+            @RequestParam(value = "sortBy", required = false) String sortBy, // Fixed
+            @RequestParam(value = "order", defaultValue = "asc") String order, // Fixed
+            @RequestParam(value = "page", defaultValue = "0") int page, // Fixed
+            @RequestParam(value = "size", defaultValue = "5") int size, // Fixed
             Model model) {
 
         List<Map<String, Object>> results;
 
+        // 1. Fetch Data
         if ("appointments".equalsIgnoreCase(category)) {
-
             if (date == null || date.isEmpty()) {
                 results = new ArrayList<>();
                 model.addAttribute("currentViewTitle", "Select Date to View Appointments");
@@ -47,71 +45,55 @@ public class ReceptionUIController {
                 results = receptionService.getAppointments(date);
                 model.addAttribute("currentViewTitle", "Appointments on " + date);
             }
-
         } else if ("nurses".equalsIgnoreCase(category)) {
-
             results = receptionService.getNurses();
             model.addAttribute("currentViewTitle", "Nurses On Call");
-
         } else {
-
             results = receptionService.getRooms();
             model.addAttribute("currentViewTitle", "Room Status");
         }
 
+        // Safety: Ensure results is never null
+        if (results == null) results = new ArrayList<>();
         results = new ArrayList<>(results);
 
-        // SORTING
+        // 2. Sorting Logic (Already well-implemented by you)
         Comparator<Map<String, Object>> comparator = null;
-
         if ("rooms".equalsIgnoreCase(category)) {
-            comparator = Comparator.comparing(
-                    m -> Integer.parseInt(m.get("roomNumber").toString())
-            );
+            comparator = Comparator.comparing(m -> Integer.parseInt(m.getOrDefault("roomNumber", "0").toString()));
         } else if ("appointments".equalsIgnoreCase(category)) {
-            comparator = Comparator.comparing(
-                    m -> m.get("patientName").toString().toLowerCase()
-            );
+            comparator = Comparator.comparing(m -> m.getOrDefault("patientName", "").toString().toLowerCase());
         } else if ("nurses".equalsIgnoreCase(category)) {
-            comparator = Comparator.comparing(
-                    m -> m.get("nurseName").toString().toLowerCase()
-            );
+            comparator = Comparator.comparing(m -> m.getOrDefault("nurseName", "").toString().toLowerCase());
         }
 
         if (comparator != null) {
-            if ("desc".equalsIgnoreCase(order)) {
-                results.sort(comparator.reversed());
-            } else {
-                results.sort(comparator);
-            }
+            if ("desc".equalsIgnoreCase(order)) results.sort(comparator.reversed());
+            else results.sort(comparator);
         }
 
-        // Paging
+        // 3. Manual Pagination
         int totalItems = results.size();
+        int totalPages = (int) Math.ceil((double) totalItems / size);
 
         int start = page * size;
+        // Safety check for empty lists or out-of-bounds pages
+        if (start >= totalItems) start = 0;
         int end = Math.min(start + size, totalItems);
 
-        // SAFETY FIX
-        if (start >= totalItems) {
-            start = 0;
-            end = Math.min(size, totalItems);
-        }
+        List<Map<String, Object>> paginatedList = (totalItems > 0)
+                ? results.subList(start, end)
+                : new ArrayList<>();
 
-        List<Map<String, Object>> paginatedList =
-                new ArrayList<>(results.subList(start, end));
-
-
+        // 4. Model Attributes
         model.addAttribute("results", paginatedList);
-
         model.addAttribute("receptionId", id);
         model.addAttribute("category", category);
         model.addAttribute("defaultDate", date);
         model.addAttribute("sortBy", sortBy);
         model.addAttribute("order", order);
-
-        model.addAttribute("currentPage", page);
-        model.addAttribute("totalPages", (int) Math.ceil((double) totalItems / size));
+        model.addAttribute("currentPage", (totalItems == 0) ? 0 : page);
+        model.addAttribute("totalPages", Math.max(1, totalPages));
         model.addAttribute("size", size);
 
         return "reception/reception-dashboard";

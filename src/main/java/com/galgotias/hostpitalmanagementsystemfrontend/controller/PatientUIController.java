@@ -1,8 +1,9 @@
 package com.galgotias.hostpitalmanagementsystemfrontend.controller;
 
-
 import com.galgotias.hostpitalmanagementsystemfrontend.dto.PatientAppointmentDTO;
 import com.galgotias.hostpitalmanagementsystemfrontend.dto.PatientPrescriptionDTO;
+import com.galgotias.hostpitalmanagementsystemfrontend.dto.PatientProfileDTO;
+import com.galgotias.hostpitalmanagementsystemfrontend.dto.PatientStayHistoryDTO;
 import com.galgotias.hostpitalmanagementsystemfrontend.response.ApiResponse;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
@@ -12,7 +13,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.client.RestClient;
-
 import java.util.List;
 
 @Controller
@@ -28,56 +28,41 @@ public class PatientUIController {
         this.restClient = restClient;
     }
 
-    // ===============================
-    // ENTER SSN PAGE
-    // ===============================
     @GetMapping("/enter")
     public String enterPatientPage() {
         return "patient/enter";
     }
 
-    // ===============================
-    // DASHBOARD (AFTER ENTERING SSN)
-    // ===============================
     @GetMapping("/dashboard")
-    public String patientDashboard(@RequestParam String id, Model model) {
-
+    public String patientDashboard(@RequestParam("id") String id, Model model) { // Added "id"
         String url = backend + "/api/v1/patients/" + id;
-
         try {
             ApiResponse<PatientProfileDTO> response = restClient.get()
                     .uri(url)
                     .retrieve()
                     .body(new ParameterizedTypeReference<ApiResponse<PatientProfileDTO>>() {});
 
-            // ❌ invalid SSN case
             if (response == null || response.getData() == null) {
                 model.addAttribute("error", "Invalid SSN. Patient not found.");
                 return "patient/enter";
             }
 
-            // ✅ valid SSN
             model.addAttribute("patientId", id);
             return "patient/dashboard";
-
         } catch (Exception e) {
             model.addAttribute("error", "Invalid SSN. Patient not found.");
             return "patient/enter";
         }
     }
 
-    // ===============================
-    // APPOINTMENTS / HISTORY
-    // ===============================
     @GetMapping("/history")
     public String getHistory(
-            @RequestParam String id,
-            @RequestParam(required = false) String date,
-            @RequestParam(required = false) String doctor,
+            @RequestParam("id") String id, // Added "id"
+            @RequestParam(value = "date", required = false) String date, // Added "date"
+            @RequestParam(value = "doctor", required = false) String doctor, // Added "doctor"
             Model model) {
 
         String url = backend + "/api/v1/patients/" + id + "/appointments";
-
         ApiResponse<List<PatientAppointmentDTO>> response = restClient.get()
                 .uri(url)
                 .retrieve()
@@ -85,19 +70,15 @@ public class PatientUIController {
 
         List<PatientAppointmentDTO> data = response.getData();
 
-        // ✅ FILTER BY DATE
         if (date != null && !date.isEmpty()) {
             data = data.stream()
-                    .filter(r -> r.getStartTime() != null &&
-                            r.getStartTime().toString().startsWith(date))
+                    .filter(r -> r.getStartTime() != null && r.getStartTime().toString().startsWith(date))
                     .toList();
         }
 
-        // ✅ FILTER BY DOCTOR
         if (doctor != null && !doctor.isEmpty()) {
             data = data.stream()
-                    .filter(r -> r.getPhysicianName() != null &&
-                            r.getPhysicianName().toLowerCase().contains(doctor.toLowerCase()))
+                    .filter(r -> r.getPhysicianName() != null && r.getPhysicianName().toLowerCase().contains(doctor.toLowerCase()))
                     .toList();
         }
 
@@ -105,17 +86,12 @@ public class PatientUIController {
         model.addAttribute("patientId", id);
         model.addAttribute("selectedDate", date);
         model.addAttribute("selectedDoctor", doctor);
-
         return "patient/history";
     }
-    // ===============================
-    // PROFILE
-    // ===============================
+
     @GetMapping("/profile")
-    public String getProfile(@RequestParam String id, Model model) {
-
+    public String getProfile(@RequestParam("id") String id, Model model) { // Added "id"
         String url = backend + "/api/v1/patients/" + id;
-
         ApiResponse<PatientProfileDTO> response = restClient.get()
                 .uri(url)
                 .retrieve()
@@ -123,18 +99,12 @@ public class PatientUIController {
 
         model.addAttribute("patient", response.getData());
         model.addAttribute("patientId", id);
-
         return "patient/profile";
     }
 
-    // ===============================
-    // PRESCRIPTIONS
-    // ===============================
     @GetMapping("/prescriptions")
-    public String getPrescriptions(@RequestParam String id, Model model) {
-
+    public String getPrescriptions(@RequestParam("id") String id, Model model) { // Added "id"
         String url = backend + "/api/v1/patients/" + id + "/prescriptions";
-
         ApiResponse<List<PatientPrescriptionDTO>> response = restClient.get()
                 .uri(url)
                 .retrieve()
@@ -142,18 +112,12 @@ public class PatientUIController {
 
         model.addAttribute("prescriptions", response.getData());
         model.addAttribute("patientId", id);
-
         return "patient/prescriptions";
     }
 
-    // ===============================
-    // STAY HISTORY
-    // ===============================
     @GetMapping("/stay-history")
-    public String getStayHistory(@RequestParam String id, Model model) {
-
+    public String getStayHistory(@RequestParam("id") String id, Model model) { // Added "id"
         String url = backend + "/api/v1/patients/" + id + "/stay-history";
-
         ApiResponse<List<PatientStayHistoryDTO>> response = restClient.get()
                 .uri(url)
                 .retrieve()
@@ -161,8 +125,6 @@ public class PatientUIController {
 
         model.addAttribute("stayHistory", response.getData());
         model.addAttribute("patientId", id);
-
         return "patient/stay-history";
     }
-
 }

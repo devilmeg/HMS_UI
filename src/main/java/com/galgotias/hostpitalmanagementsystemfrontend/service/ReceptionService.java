@@ -1,5 +1,7 @@
 package com.galgotias.hostpitalmanagementsystemfrontend.service;
 
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
 
@@ -11,7 +13,9 @@ import java.util.Map;
 public class ReceptionService {
 
     private final RestClient restClient;
-    private final String BASE_URL = "http://localhost:8080/api/v1";
+
+    @Value("${hms.backend.url}")
+    private String backendUrl; // Renamed for clarity
 
     public ReceptionService(RestClient restClient) {
         this.restClient = restClient;
@@ -20,57 +24,61 @@ public class ReceptionService {
     // ROOMS
     public List<Map<String, Object>> getRooms() {
         try {
-            Map response = restClient.get()
-                    .uri(BASE_URL + "/rooms/status")
+            // Ensure the /api/v1/ prefix is present to avoid 404/500 errors
+            String url = backendUrl + "/api/v1/rooms/status";
+
+            Map<String, Object> response = restClient.get()
+                    .uri(url)
                     .retrieve()
-                    .body(Map.class);
+                    .body(new ParameterizedTypeReference<Map<String, Object>>() {});
 
             if (response != null && response.get("data") != null) {
                 return (List<Map<String, Object>>) response.get("data");
             }
 
         } catch (Exception e) {
-            System.out.println("Rooms API error: " + e.getMessage());
+            System.err.println("Rooms API error: " + e.getMessage());
         }
-
         return new ArrayList<>();
     }
 
     // NURSES
     public List<Map<String, Object>> getNurses() {
         try {
-            Map response = restClient.get()
-                    .uri(BASE_URL + "/nurses/on-call")
+            String url = backendUrl + "/api/v1/nurses/on-call";
+
+            Map<String, Object> response = restClient.get()
+                    .uri(url)
                     .retrieve()
-                    .body(Map.class);
+                    .body(new ParameterizedTypeReference<Map<String, Object>>() {});
 
             if (response != null && response.get("data") != null) {
                 return (List<Map<String, Object>>) response.get("data");
             }
 
         } catch (Exception e) {
-            System.out.println("Nurses API error: " + e.getMessage());
+            System.err.println("Nurses API error: " + e.getMessage());
         }
-
         return new ArrayList<>();
     }
 
     // APPOINTMENTS
     public List<Map<String, Object>> getAppointments(String date) {
         try {
-            Map response = restClient.get()
-                    .uri(BASE_URL + "/appointments/date/" + date)
+            String url = backendUrl + "/api/v1/appointments/date/" + date;
+
+            Map<String, Object> response = restClient.get()
+                    .uri(url)
                     .retrieve()
-                    .body(Map.class);
+                    .body(new ParameterizedTypeReference<Map<String, Object>>() {});
 
             if (response != null && response.get("data") != null) {
                 return (List<Map<String, Object>>) response.get("data");
             }
 
         } catch (Exception e) {
-            System.out.println("Appointments API error: " + e.getMessage());
+            System.err.println("Appointments API error: " + e.getMessage());
         }
-
         return new ArrayList<>();
     }
 }

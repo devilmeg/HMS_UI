@@ -9,8 +9,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -19,53 +17,50 @@ import java.util.Map;
 public class DoctorUIController {
     private final DoctorService doctorService;
 
-    public DoctorUIController(DoctorService doctorServiceService) {
-        this.doctorService = doctorServiceService;
+    public DoctorUIController(DoctorService doctorService) {
+        this.doctorService = doctorService;
     }
 
     @GetMapping("/{id}/dashboard")
     public String showDashboard(
-            @PathVariable Integer id,
-            @RequestParam(required = false, defaultValue = "PATIENT") String category,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam (defaultValue = "2") int size,
-            @RequestParam(required = false) String date,
+            @PathVariable("id") Integer id, // Fixed: Added "id"
+            @RequestParam(value = "category", required = false, defaultValue = "PATIENT") String category, // Fixed: Added "category"
+            @RequestParam(value = "page", defaultValue = "0") int page, // Fixed: Added "page"
+            @RequestParam(value = "size", defaultValue = "2") int size, // Fixed: Added "size"
+            @RequestParam(value = "date", required = false) String date, // Fixed: Added "date"
             Model model) {
 
-        if ("APPOINTMENT".equals(category)) {
-            Map<String, Object> pageData = doctorService.getAppointment(id, date, page, size);
-            // FLATTEN: If the data is inside 'content', pull it out
-            model.addAttribute("results", pageData.get("content"));
-            // Handle the nested metadata
-            model.addAttribute("pageMetadata", pageData.containsKey("page") ? pageData.get("page") : pageData);
+        try {
+            if ("APPOINTMENT".equals(category)) {
+                Map<String, Object> pageData = doctorService.getAppointment(id, date, page, size);
+                model.addAttribute("results", pageData.get("content"));
+                model.addAttribute("pageMetadata", pageData.containsKey("page") ? pageData.get("page") : pageData);
+            }
+            else if ("TRAINING".equals(category)) {
+                Map<String, Object> pageData = doctorService.getProcedures(id, page, size);
+                model.addAttribute("results", pageData.get("content"));
+                model.addAttribute("pageMetadata", pageData.containsKey("page") ? pageData.get("page") : pageData);
+            } else {
+                Map<String, Object> patientPage = doctorService.getPatients(id, page, size);
+                model.addAttribute("results", patientPage.get("content"));
+                model.addAttribute("pageMetadata", patientPage);
+            }
+        } catch (Exception e) {
+            model.addAttribute("error", "Backend Service Unavailable");
         }
-        else if ("TRAINING".equals(category)) {
-            Map<String, Object> pageData = doctorService.getProcedures(id, page, size);
-            model.addAttribute("results", pageData.get("content"));
-            model.addAttribute("pageMetadata", pageData.containsKey("page") ? pageData.get("page") : pageData);
-        } else {
-            // PATIENT (Already working)
-            Map<String, Object> patientPage = doctorService.getPatients(id, page, size);
-            model.addAttribute("results", patientPage.get("content"));
-            model.addAttribute("pageMetadata", patientPage);
-        }
-
 
         model.addAttribute("doctorId", id);
         model.addAttribute("category", category);
+        model.addAttribute("size", size);
         return "doctor/dashboard";
     }
 
     @GetMapping("/patient/{ssn}/history")
     public String showPatientHistory(@PathVariable("ssn") Integer ssn, Model model) {
-        // Fetch the unified timeline (Appointments + Procedures)
         List<DoctorPatientHistoryDto> history = doctorService.getDoctorPatientHistory(ssn);
-
         model.addAttribute("history", history);
         model.addAttribute("ssn", ssn);
         model.addAttribute("currentViewTitle", "ASTRAL_CHRONOLOGY // SECURE_ACCESS");
-
-        return "doctor/patient-history"; // Your new Astral History HTML file
+        return "doctor/patient-history";
     }
-
 }

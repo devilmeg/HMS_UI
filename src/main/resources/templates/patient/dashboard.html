@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Patient Dashboard | HMS</title>
+
+    <link rel="stylesheet" th:href="@{/css/monitor.css}">
+
+    <style>
+        body {
+            margin: 0;
+            padding: 40px;
+            font-family: 'Inter', system-ui, sans-serif;
+            background-image: url('https://images.unsplash.com/photo-1629909613654-28e377c37b09?q=80&w=2070');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(15, 23, 42, 0.85);
+            backdrop-filter: blur(10px);
+            z-index: -1;
+        }
+
+        .portal-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 24px;
+            max-width: 1100px;
+            margin: 50px auto;
+        }
+
+        .portal-card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 35px;
+            text-decoration: none;
+            color: #0F172A;
+            transition: 0.3s;
+        }
+
+        .portal-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 25px 50px rgba(0,0,0,0.3);
+        }
+
+        .icon-box {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+            font-size: 22px;
+        }
+
+        .profile { background: #DBEAFE; }
+        .appointments { background: #DCFCE7; }
+        .prescriptions { background: #FEF3C7; }
+        .stay { background: #F3E8FF; }
+
+        h2 {
+            margin: 0;
+            font-size: 1.2rem;
+        }
+
+        p {
+            margin-top: 10px;
+            color: #64748B;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+        }
+
+        .back-btn {
+            display: inline-block;
+            margin-top: 20px;
+            color: #38bdf8;
+            text-decoration: none;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="monitor-viewport">
+
+    <div class="monitor-content">
+        <h1>PATIENT DASHBOARD</h1>
+        <p>> PATIENT_ID:
+            <span th:text="${patientId}"></span>
+            | STATUS: ACTIVE
+        </p>
+    </div>
+
+    <div class="ekg-container">
+        <svg viewBox="0 0 1000 100" preserveAspectRatio="none" class="ekg-svg">
+            <path d="M0 50 L100 50 L105 20 L110 80 L115 50 L250 50 L255 20 L260 80 L265 50 L400 50 L405 20 L410 80 L415 50 L550 50 L555 20 L560 80 L565 50 L750 50 L755 20 L760 80 L770 50 L900 50 L905 20 L910 80 L920 50 L1000 50" />
+        </svg>
+    </div>
+
+</div>
+
+<div class="portal-grid">
+
+    <!-- ✅ FIXED LINKS (RequestParam based) -->
+    <a th:href="@{/ui/patient/profile(id=${patientId})}" class="portal-card">
+        <div class="icon-box profile">👤</div>
+        <h2>Profile</h2>
+        <p>View personal details and assigned physician.</p>
+    </a>
+
+    <a th:href="@{/ui/patient/history(id=${patientId})}" class="portal-card">
+        <div class="icon-box appointments">📅</div>
+        <h2>Appointments</h2>
+        <p>Check appointment history and doctor visits.</p>
+    </a>
+
+    <a th:href="@{/ui/patient/prescriptions(id=${patientId})}" class="portal-card">
+        <div class="icon-box prescriptions">💊</div>
+        <h2>Prescriptions</h2>
+        <p>View medicines and dosage information.</p>
+    </a>
+
+    <a th:href="@{/ui/patient/stay-history(id=${patientId})}" class="portal-card">
+        <div class="icon-box stay">🏥</div>
+        <h2>Stay History</h2>
+        <p>Hospital admissions and discharge records.</p>
+    </a>
+
+</div>
+
+<div style="text-align:center;">
+    <!-- ✅ ALSO FIXED BACK LINK -->
+    <a th:href="@{/ui/patient/enter}" class="back-btn">⬅ Back to Enter SSN</a>
+</div>
+
+</body>
+</html>

@@ -44,7 +44,7 @@
             text-align: left;
         }
 
-        /* 🔥 FIXED HEADER */
+        /* FIXED HEADER */
         th {
             color: #38bdf8;
             background: transparent; /* remove white */
@@ -52,12 +52,12 @@
             letter-spacing: 0.5px;
         }
 
-        /* 🔥 FIXED TEXT VISIBILITY */
+        /*  FIXED TEXT VISIBILITY */
         td {
             color: #e2e8f0;
         }
 
-        /* 🔥 CLEAN ROW STYLE */
+        /*  CLEAN ROW STYLE */
         tr {
             border-bottom: 1px solid rgba(255,255,255,0.08);
         }
@@ -108,7 +108,7 @@
 
             <tbody>
             <tr th:each="record : ${stayHistory}">
-                <!-- ✅ IMPORTANT: match your DTO fields -->
+                <!--  IMPORTANT: match your DTO fields -->
                 <td th:text="${record.admittedAt}"></td>
                 <td th:text="${record.dischargedAt}"></td>
                 <td th:text="${record.roomNumber}"></td>
